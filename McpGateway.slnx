@@ -1,0 +1,17 @@
+<Solution>
+  <Folder Name="/src/" />
+  <Folder Name="/src/api/">
+    <Project Path="src/api/McpGateway.Api/McpGateway.Api.csproj" />
+  </Folder>
+  <Folder Name="/src/mcp/">
+    <Project Path="src/mcp/McpGateway.Mcp/McpGateway.Mcp.csproj" />
+  </Folder>
+  <Folder Name="/src/shared/">
+    <Project Path="src/shared/McpGateway.Core/McpGateway.Core.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/McpGateway.Api.Tests/McpGateway.Api.Tests.csproj" />
+    <Project Path="tests/McpGateway.Core.Tests/McpGateway.Core.Tests.csproj" />
+    <Project Path="tests/McpGateway.Mcp.Tests/McpGateway.Mcp.Tests.csproj" />
+  </Folder>
+</Solution>

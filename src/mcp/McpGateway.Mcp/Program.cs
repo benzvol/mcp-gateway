@@ -6,7 +6,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
-builder.Services.AddGatewayPersistence(builder.Configuration.GetConnectionString("Gateway")!);
+builder.Services
+    .AddGatewayPersistence(builder.Configuration.GetConnectionString("Gateway")!)
+    .AddGatewayDatabaseInitializer();
 
 var app = builder.Build();
 

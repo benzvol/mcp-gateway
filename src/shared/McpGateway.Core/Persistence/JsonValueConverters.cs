@@ -13,7 +13,7 @@ internal static class JsonValueConverters
 
     public static ValueComparer<List<string>> StringListComparer { get; } = new(
         (a, b) => (a ?? new List<string>()).SequenceEqual(b ?? new List<string>()),
-        v => v.Aggregate(0, HashCode.Combine),
+        v => (v ?? new List<string>()).Aggregate(0, HashCode.Combine),
         v => v.ToList());
 
     public static ValueConverter<Dictionary<string, string>, string> StringDictionary { get; } = new(
@@ -23,7 +23,8 @@ internal static class JsonValueConverters
 
     public static ValueComparer<Dictionary<string, string>> StringDictionaryComparer { get; } = new(
         (a, b) => DictionariesEqual(a ?? new Dictionary<string, string>(), b ?? new Dictionary<string, string>()),
-        v => v.Aggregate(0, (hash, kv) => HashCode.Combine(hash, kv.Key, kv.Value)),
+        v => (v ?? new Dictionary<string, string>())
+            .Aggregate(0, (hash, kv) => hash ^ HashCode.Combine(kv.Key, kv.Value)),
         v => v.ToDictionary(kv => kv.Key, kv => kv.Value));
 
     private static bool DictionariesEqual(Dictionary<string, string> a, Dictionary<string, string> b)

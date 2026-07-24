@@ -9,8 +9,7 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddGatewayPersistence(this IServiceCollection services, string connectionString)
     {
-        services.AddDbContext<GatewayDbContext>(options =>
-            options.UseSqlite(connectionString).UseSnakeCaseNamingConvention());
+        services.AddDbContext<GatewayDbContext>(options => options.ConfigureGateway(connectionString));
         return services;
     }
 

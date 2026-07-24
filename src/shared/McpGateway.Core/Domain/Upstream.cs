@@ -6,7 +6,7 @@ public class Upstream
 
     public required string Name { get; set; }
 
-    public bool Enabled { get; set; }
+    public bool Enabled { get; set; } = true;
 
     public TransportKind Transport { get; set; }
 

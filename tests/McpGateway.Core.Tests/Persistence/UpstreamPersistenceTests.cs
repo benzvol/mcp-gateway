@@ -8,6 +8,20 @@ namespace McpGateway.Core.Tests.Persistence;
 public class UpstreamPersistenceTests : PersistenceTestBase
 {
     [Test]
+    public async Task Upstream_DefaultsToEnabled()
+    {
+        var upstream = new Upstream { Id = Guid.NewGuid(), Name = "default-upstream", Transport = TransportKind.Stdio };
+
+        Context.Upstreams.Add(upstream);
+        await Context.SaveChangesAsync();
+
+        await using var freshContext = CreateContext();
+        var loaded = await freshContext.Upstreams.SingleAsync(u => u.Id == upstream.Id);
+
+        await Assert.That(loaded.Enabled).IsTrue();
+    }
+
+    [Test]
     public async Task StdioUpstream_RoundTripsCommandArgsAndEnvironment()
     {
         var upstream = new Upstream

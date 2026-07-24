@@ -19,3 +19,17 @@ public class GatewayDbContext(DbContextOptions<GatewayDbContext> options) : DbCo
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(GatewayDbContext).Assembly);
     }
 }
+
+public static class GatewayDbContextOptionsBuilderExtensions
+{
+    public static DbContextOptionsBuilder ConfigureGateway(this DbContextOptionsBuilder builder, string connectionString)
+    {
+        return builder.UseSqlite(connectionString).UseSnakeCaseNamingConvention();
+    }
+
+    public static DbContextOptionsBuilder<GatewayDbContext> ConfigureGateway(
+        this DbContextOptionsBuilder<GatewayDbContext> builder, string connectionString)
+    {
+        return (DbContextOptionsBuilder<GatewayDbContext>)((DbContextOptionsBuilder)builder).ConfigureGateway(connectionString);
+    }
+}

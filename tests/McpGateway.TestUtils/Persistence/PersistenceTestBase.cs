@@ -30,7 +30,7 @@ public abstract class PersistenceTestBase
     protected GatewayDbContext CreateContext()
     {
         var optionsBuilder = new DbContextOptionsBuilder<GatewayDbContext>();
-        optionsBuilder.UseSqlite($"Data Source={_databasePath};Pooling=false").UseSnakeCaseNamingConvention();
+        optionsBuilder.ConfigureGateway($"Data Source={_databasePath};Pooling=false");
         return new GatewayDbContext(optionsBuilder.Options);
     }
 }

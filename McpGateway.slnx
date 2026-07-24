@@ -13,5 +13,6 @@
     <Project Path="tests/McpGateway.Api.Tests/McpGateway.Api.Tests.csproj" />
     <Project Path="tests/McpGateway.Core.Tests/McpGateway.Core.Tests.csproj" />
     <Project Path="tests/McpGateway.Mcp.Tests/McpGateway.Mcp.Tests.csproj" />
+    <Project Path="tests/McpGateway.TestUtils/McpGateway.TestUtils.csproj" />
   </Folder>
 </Solution>

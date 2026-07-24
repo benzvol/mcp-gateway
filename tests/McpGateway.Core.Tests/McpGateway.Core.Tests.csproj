@@ -5,12 +5,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="EFCore.NamingConventions" />
     <PackageReference Include="TUnit" />
     <PackageReference Include="TUnit.Mocks" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\shared\McpGateway.Core\McpGateway.Core.csproj" />
+    <ProjectReference Include="..\McpGateway.TestUtils\McpGateway.TestUtils.csproj" />
   </ItemGroup>
 
 </Project>

@@ -4,13 +4,26 @@
     <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
   </PropertyGroup>
   <ItemGroup Label="ASP.NET Core">
+    <PackageVersion Include="EFCore.NamingConventions" Version="10.0.1" />
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.10" />
-    <!-- Transitive pin: Microsoft.AspNetCore.OpenApi 10.0.9 pulls in Microsoft.OpenApi
-         2.0.0 which has a high-severity advisory (GHSA-v5pm-xwqc-g5wc); 2.7.5 is patched. -->
-    <PackageVersion Include="Microsoft.OpenApi" Version="2.7.5" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.10">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageVersion>
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.10" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.10" />
+    <PackageVersion Include="TUnit.Core" Version="1.61.38" />
   </ItemGroup>
   <ItemGroup Label="Testing">
     <PackageVersion Include="TUnit" Version="1.61.38" />
     <PackageVersion Include="TUnit.Mocks" Version="1.61.38" />
+  </ItemGroup>
+  <ItemGroup Label="Transitive pins">
+    <!-- Microsoft.AspNetCore.OpenApi 10.0.9 pulls in Microsoft.OpenApi 2.0.0, which has
+         a high-severity advisory (GHSA-v5pm-xwqc-g5wc); 2.7.5 is patched. -->
+    <PackageVersion Include="Microsoft.OpenApi" Version="2.7.5" />
+    <!-- Microsoft.EntityFrameworkCore.Sqlite 10.0.10 pulls in SQLitePCLRaw.bundle_e_sqlite3
+         2.1.11, which has a high-severity advisory (GHSA-2m69-gcr7-jv3q); 2.1.12 is patched. -->
+    <PackageVersion Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.12" />
   </ItemGroup>
 </Project>

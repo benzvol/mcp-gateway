@@ -12,8 +12,7 @@ internal static class ConnectionFailureCategorizer
         Exception exception, CancellationToken timeoutToken = default
     ) => exception switch
     {
-        ArgumentException => ConnectionFailureKind.Configuration,
-        Win32Exception => ConnectionFailureKind.Configuration,
+        ArgumentException or Win32Exception => ConnectionFailureKind.Configuration,
         OperationCanceledException => timeoutToken.IsCancellationRequested
             ? ConnectionFailureKind.Timeout
             : ConnectionFailureKind.Unknown,

@@ -20,6 +20,7 @@ internal static class UpstreamMapping
         Secret = request.Secret,
     };
 
+    // Secret/AuthConfigJson are never echoed back by GET/List, so null here means "unchanged"; empty string clears it.
     public static void Apply(UpdateUpstreamRequest request, Upstream upstream)
     {
         upstream.Name = request.Name;
@@ -31,8 +32,16 @@ internal static class UpstreamMapping
         upstream.Endpoint = request.Endpoint;
         upstream.Headers = request.Headers ?? [];
         upstream.AuthKind = request.AuthKind;
-        upstream.AuthConfigJson = request.AuthConfigJson;
-        upstream.Secret = request.Secret;
+
+        if (request.AuthConfigJson is not null)
+        {
+            upstream.AuthConfigJson = request.AuthConfigJson.Length == 0 ? null : request.AuthConfigJson;
+        }
+
+        if (request.Secret is not null)
+        {
+            upstream.Secret = request.Secret.Length == 0 ? null : request.Secret;
+        }
     }
 
     public static UpstreamResponse ToResponse(Upstream upstream) => new(

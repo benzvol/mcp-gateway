@@ -3,6 +3,7 @@ using McpGateway.Core.Persistence;
 using McpGateway.Core.Upstreams;
 
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
 namespace McpGateway.Api.Upstreams;
@@ -58,7 +59,7 @@ public static class UpstreamEndpoints
         {
             await db.SaveChangesAsync();
         }
-        catch (DbUpdateException)
+        catch (DbUpdateException ex) when (IsUniqueNameViolation(ex))
         {
             return TypedResults.Conflict($"An upstream named '{request.Name}' already exists.");
         }
@@ -92,7 +93,7 @@ public static class UpstreamEndpoints
         {
             await db.SaveChangesAsync();
         }
-        catch (DbUpdateException)
+        catch (DbUpdateException ex) when (IsUniqueNameViolation(ex))
         {
             return TypedResults.Conflict($"An upstream named '{request.Name}' already exists.");
         }
@@ -160,16 +161,19 @@ public static class UpstreamEndpoints
         return TypedResults.Ok(UpstreamMapping.ToResponse(result));
     }
 
+    private static bool IsUniqueNameViolation(DbUpdateException exception) =>
+        exception.InnerException is SqliteException { SqliteExtendedErrorCode: 2067 };
+
     private static Dictionary<string, string[]>? Validate(TransportKind transport, string? command, string? endpoint)
     {
         var errors = new Dictionary<string, string[]>();
 
-        if (transport == TransportKind.Stdio && string.IsNullOrWhiteSpace(command))
+        if (UpstreamValidation.StdioRequiresCommand(transport, command))
         {
             errors[nameof(command)] = ["A stdio upstream requires a command."];
         }
 
-        if (transport == TransportKind.StreamableHttp && string.IsNullOrWhiteSpace(endpoint))
+        if (UpstreamValidation.HttpRequiresEndpoint(transport, endpoint))
         {
             errors[nameof(endpoint)] = ["A Streamable HTTP upstream requires an endpoint URL."];
         }

@@ -21,7 +21,9 @@ public static class UpstreamEndpoints
             group.MapPost("/", CreateUpstream);
             group.MapPut("/{id:guid}", UpdateUpstream);
             group.MapDelete("/{id:guid}", DeleteUpstream);
+
             group.MapPost("/{id:guid}/enabled", SetEnabled);
+
             group.MapPost("/test", TestUnsavedConnection);
             group.MapPost("/{id:guid}/test", TestSavedConnection);
         }

@@ -34,7 +34,7 @@ internal sealed class UpstreamConnector : IUpstreamConnector
             Arguments = upstream.Args,
             EnvironmentVariables = upstream.Environment.ToDictionary(
                 kvp => kvp.Key,
-                kvp => (string?)kvp.Value),
+                string? (kvp) => kvp.Value),
         });
     }
 

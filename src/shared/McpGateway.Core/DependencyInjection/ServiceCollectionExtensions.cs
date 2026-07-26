@@ -23,9 +23,12 @@ public static class ServiceCollectionExtensions
 
         public IServiceCollection AddUpstreamConnectivity(Action<ConnectionTestOptions>? configure = null)
         {
-            services.AddOptions<ConnectionTestOptions>().Configure(configure ?? (_ => { }));
-            services.AddSingleton<IUpstreamConnector, UpstreamConnector>();
-            services.AddSingleton<IConnectionTester, ConnectionTester>();
+            var connectionTestOptionsBuilder = services.AddOptions<ConnectionTestOptions>();
+            if (configure is not null) connectionTestOptionsBuilder.Configure(configure);
+
+            services
+                .AddSingleton<IUpstreamConnector, UpstreamConnector>()
+                .AddSingleton<IConnectionTester, ConnectionTester>();
             return services;
         }
     }

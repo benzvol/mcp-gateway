@@ -1,5 +1,6 @@
 using McpGateway.Core.Persistence;
 
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -12,6 +13,13 @@ public class DatabaseInitializer(IServiceScopeFactory scopeFactory) : IHostedSer
     {
         using var scope = scopeFactory.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<GatewayDbContext>();
+
+        var dataSource = new SqliteConnectionStringBuilder(context.Database.GetConnectionString()).DataSource;
+        var directory = Path.GetDirectoryName(Path.GetFullPath(dataSource));
+        if (!string.IsNullOrEmpty(directory))
+        {
+            Directory.CreateDirectory(directory);
+        }
 
         await context.Database.MigrateAsync(cancellationToken);
         await context.Database.ExecuteSqlRawAsync("PRAGMA journal_mode=WAL;", cancellationToken);

@@ -1,6 +1,6 @@
 using McpGateway.Core.Persistence;
+using McpGateway.Core.Upstreams;
 
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace McpGateway.Core.DependencyInjection;
@@ -18,6 +18,17 @@ public static class ServiceCollectionExtensions
         public IServiceCollection AddGatewayDatabaseInitializer()
         {
             services.AddHostedService<DatabaseInitializer>();
+            return services;
+        }
+
+        public IServiceCollection AddUpstreamConnectivity(Action<ConnectionTestOptions>? configure = null)
+        {
+            var connectionTestOptionsBuilder = services.AddOptions<ConnectionTestOptions>();
+            if (configure is not null) connectionTestOptionsBuilder.Configure(configure);
+
+            services
+                .AddSingleton<IUpstreamConnector, UpstreamConnector>()
+                .AddSingleton<IConnectionTester, ConnectionTester>();
             return services;
         }
     }

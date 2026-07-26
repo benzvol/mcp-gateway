@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Net;
 
 using McpGateway.Core.Upstreams;
@@ -17,11 +18,32 @@ public class ConnectionFailureCategorizerTests
     }
 
     [Test]
-    public async Task OperationCanceledException_MapsToTimeout()
+    public async Task Win32Exception_MapsToConfiguration()
     {
-        var kind = ConnectionFailureCategorizer.Categorize(new OperationCanceledException());
+        var kind = ConnectionFailureCategorizer.Categorize(new Win32Exception("cannot start process"));
+
+        await Assert.That(kind).IsEqualTo(ConnectionFailureKind.Configuration);
+    }
+
+    [Test]
+    public async Task OperationCanceledException_WhenTimeoutTokenCancelled_MapsToTimeout()
+    {
+        using var timeoutCts = new CancellationTokenSource();
+        timeoutCts.Cancel();
+
+        var kind = ConnectionFailureCategorizer.Categorize(new OperationCanceledException(), timeoutCts.Token);
 
         await Assert.That(kind).IsEqualTo(ConnectionFailureKind.Timeout);
+    }
+
+    [Test]
+    public async Task OperationCanceledException_WhenTimeoutTokenNotCancelled_MapsToUnknown()
+    {
+        using var timeoutCts = new CancellationTokenSource();
+
+        var kind = ConnectionFailureCategorizer.Categorize(new OperationCanceledException(), timeoutCts.Token);
+
+        await Assert.That(kind).IsEqualTo(ConnectionFailureKind.Unknown);
     }
 
     [Test]

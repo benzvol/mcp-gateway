@@ -22,7 +22,7 @@ internal sealed class UpstreamConnector : IUpstreamConnector
 
     private static StdioClientTransport BuildStdioTransport(Upstream upstream)
     {
-        if (string.IsNullOrWhiteSpace(upstream.Command))
+        if (UpstreamValidation.StdioRequiresCommand(upstream.Transport, upstream.Command))
         {
             throw new ArgumentException("A stdio upstream requires a command.", nameof(upstream));
         }
@@ -30,7 +30,7 @@ internal sealed class UpstreamConnector : IUpstreamConnector
         return new StdioClientTransport(new StdioClientTransportOptions
         {
             Name = upstream.Name,
-            Command = upstream.Command,
+            Command = upstream.Command!,
             Arguments = upstream.Args,
             EnvironmentVariables = upstream.Environment.ToDictionary(
                 kvp => kvp.Key,
@@ -40,7 +40,7 @@ internal sealed class UpstreamConnector : IUpstreamConnector
 
     private static HttpClientTransport BuildHttpTransport(Upstream upstream)
     {
-        if (string.IsNullOrWhiteSpace(upstream.Endpoint) ||
+        if (UpstreamValidation.HttpRequiresEndpoint(upstream.Transport, upstream.Endpoint) ||
             !Uri.TryCreate(upstream.Endpoint, UriKind.Absolute, out var endpoint))
         {
             throw new ArgumentException("A Streamable HTTP upstream requires an absolute endpoint URL.",

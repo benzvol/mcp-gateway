@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Net;
 
 using ModelContextProtocol;
@@ -7,10 +8,15 @@ namespace McpGateway.Core.Upstreams;
 
 internal static class ConnectionFailureCategorizer
 {
-    public static ConnectionFailureKind Categorize(Exception exception) => exception switch
+    public static ConnectionFailureKind Categorize(
+        Exception exception, CancellationToken timeoutToken = default
+    ) => exception switch
     {
         ArgumentException => ConnectionFailureKind.Configuration,
-        OperationCanceledException => ConnectionFailureKind.Timeout,
+        Win32Exception => ConnectionFailureKind.Configuration,
+        OperationCanceledException => timeoutToken.IsCancellationRequested
+            ? ConnectionFailureKind.Timeout
+            : ConnectionFailureKind.Unknown,
         HttpRequestException http => CategorizeHttp(http),
         ClientTransportClosedException => ConnectionFailureKind.Unreachable,
         McpException => ConnectionFailureKind.Protocol,

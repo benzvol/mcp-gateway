@@ -6,30 +6,49 @@ using Microsoft.Extensions.Options;
 
 namespace McpGateway.Core.Upstreams;
 
-internal sealed class ConnectionTester(IUpstreamConnector connector, IOptions<ConnectionTestOptions> options)
-    : IConnectionTester
+internal sealed class ConnectionTester : IConnectionTester
 {
+    private readonly IUpstreamConnector _connector;
+    private readonly IOptions<ConnectionTestOptions> _options;
+    private readonly SemaphoreSlim _concurrencyLimiter;
+
+    public ConnectionTester(IUpstreamConnector connector, IOptions<ConnectionTestOptions> options)
+    {
+        _connector = connector;
+        _options = options;
+        _concurrencyLimiter = new SemaphoreSlim(options.Value.MaxConcurrentTests);
+    }
+
     public async Task<ConnectionTestResult> TestAsync(Upstream upstream, CancellationToken cancellationToken = default)
     {
         var stopwatch = Stopwatch.StartNew();
-        using var timeoutCts = new CancellationTokenSource(options.Value.Timeout);
-        using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCts.Token);
 
+        await _concurrencyLimiter.WaitAsync(cancellationToken);
         try
         {
-            await using var client = await connector.ConnectAsync(upstream, linkedCts.Token);
-            var tools = await client.ListToolsAsync(cancellationToken: linkedCts.Token);
+            using var timeoutCts = new CancellationTokenSource(_options.Value.Timeout);
+            using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCts.Token);
 
-            var discovered = tools
-                .Select(tool => new DiscoveredTool(tool.Name, tool.Description))
-                .ToArray();
+            try
+            {
+                await using var client = await _connector.ConnectAsync(upstream, linkedCts.Token);
+                var tools = await client.ListToolsAsync(cancellationToken: linkedCts.Token);
 
-            return ConnectionTestResult.Ok(discovered, stopwatch.Elapsed);
+                var discovered = tools
+                    .Select(tool => new DiscoveredTool(tool.Name, tool.Description))
+                    .ToArray();
+
+                return ConnectionTestResult.Ok(discovered, stopwatch.Elapsed);
+            }
+            catch (Exception ex)
+            {
+                var kind = ConnectionFailureCategorizer.Categorize(ex, timeoutCts.Token);
+                return ConnectionTestResult.Fail(kind, ex.Message, stopwatch.Elapsed);
+            }
         }
-        catch (Exception ex)
+        finally
         {
-            var kind = ConnectionFailureCategorizer.Categorize(ex);
-            return ConnectionTestResult.Fail(kind, ex.Message, stopwatch.Elapsed);
+            _concurrencyLimiter.Release();
         }
     }
 }

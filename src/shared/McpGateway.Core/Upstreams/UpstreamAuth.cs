@@ -44,8 +44,12 @@ internal static class UpstreamAuth
         }
 
         var config = ParseApiKeyConfig(upstream.AuthConfigJson);
-        var header = config?.Header ?? DefaultHeader;
-        var scheme = config?.Scheme ?? (config?.Header is null ? DefaultScheme : null);
+        var header = string.IsNullOrEmpty(config?.Header) ? DefaultHeader : config.Header;
+        var scheme = !string.IsNullOrEmpty(config?.Scheme)
+            ? config.Scheme
+            : string.IsNullOrEmpty(config?.Header)
+                ? DefaultScheme
+                : null;
 
         headers[header] = scheme is null ? upstream.Secret : $"{scheme} {upstream.Secret}";
     }

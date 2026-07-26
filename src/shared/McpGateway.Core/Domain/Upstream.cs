@@ -1,8 +1,10 @@
+using McpGateway.Core.Domain.Enums;
+
 namespace McpGateway.Core.Domain;
 
 public class Upstream
 {
-    public Guid Id { get; set; }
+    public Guid Id { get; init; } = Guid.CreateVersion7();
 
     public required string Name { get; set; }
 

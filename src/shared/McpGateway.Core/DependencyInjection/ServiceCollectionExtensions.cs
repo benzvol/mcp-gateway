@@ -7,15 +7,18 @@ namespace McpGateway.Core.DependencyInjection;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddGatewayPersistence(this IServiceCollection services, string connectionString)
+    extension(IServiceCollection services)
     {
-        services.AddDbContext<GatewayDbContext>(options => options.ConfigureGateway(connectionString));
-        return services;
-    }
+        public IServiceCollection AddGatewayPersistence(string connectionString)
+        {
+            services.AddDbContext<GatewayDbContext>(options => options.ConfigureGateway(connectionString));
+            return services;
+        }
 
-    public static IServiceCollection AddGatewayDatabaseInitializer(this IServiceCollection services)
-    {
-        services.AddHostedService<DatabaseInitializer>();
-        return services;
+        public IServiceCollection AddGatewayDatabaseInitializer()
+        {
+            services.AddHostedService<DatabaseInitializer>();
+            return services;
+        }
     }
 }

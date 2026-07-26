@@ -1,4 +1,5 @@
 using McpGateway.Core.Domain;
+using McpGateway.Core.Domain.Enums;
 using McpGateway.TestUtils.Persistence;
 
 using Microsoft.EntityFrameworkCore;
@@ -10,13 +11,12 @@ public class ToolOverridePersistenceTests : PersistenceTestBase
     [Test]
     public async Task ToolOverride_RoundTripsOverrideFields()
     {
-        var upstream = new Upstream { Id = Guid.NewGuid(), Name = "upstream", Transport = TransportKind.Stdio };
+        var upstream = new Upstream { Name = "upstream", Transport = TransportKind.Stdio };
         Context.Upstreams.Add(upstream);
         await Context.SaveChangesAsync();
 
         var toolOverride = new ToolOverride
         {
-            Id = Guid.NewGuid(),
             UpstreamId = upstream.Id,
             ToolName = "search",
             Enabled = false,
@@ -39,14 +39,14 @@ public class ToolOverridePersistenceTests : PersistenceTestBase
     [Test]
     public async Task DuplicateToolNameForSameUpstream_ViolatesUniqueIndex()
     {
-        var upstream = new Upstream { Id = Guid.NewGuid(), Name = "upstream", Transport = TransportKind.Stdio };
+        var upstream = new Upstream { Name = "upstream", Transport = TransportKind.Stdio };
         Context.Upstreams.Add(upstream);
         await Context.SaveChangesAsync();
 
-        Context.ToolOverrides.Add(new ToolOverride { Id = Guid.NewGuid(), UpstreamId = upstream.Id, ToolName = "search" });
+        Context.ToolOverrides.Add(new ToolOverride { UpstreamId = upstream.Id, ToolName = "search" });
         await Context.SaveChangesAsync();
 
-        Context.ToolOverrides.Add(new ToolOverride { Id = Guid.NewGuid(), UpstreamId = upstream.Id, ToolName = "search" });
+        Context.ToolOverrides.Add(new ToolOverride { UpstreamId = upstream.Id, ToolName = "search" });
 
         await Assert.That(async () => await Context.SaveChangesAsync()).Throws<DbUpdateException>();
     }
@@ -54,10 +54,10 @@ public class ToolOverridePersistenceTests : PersistenceTestBase
     [Test]
     public async Task DeletingUpstream_CascadesToToolOverrides()
     {
-        var upstream = new Upstream { Id = Guid.NewGuid(), Name = "upstream", Transport = TransportKind.Stdio };
+        var upstream = new Upstream { Name = "upstream", Transport = TransportKind.Stdio };
         Context.Upstreams.Add(upstream);
 
-        var toolOverride = new ToolOverride { Id = Guid.NewGuid(), UpstreamId = upstream.Id, ToolName = "search" };
+        var toolOverride = new ToolOverride { UpstreamId = upstream.Id, ToolName = "search" };
         Context.ToolOverrides.Add(toolOverride);
         await Context.SaveChangesAsync();
 

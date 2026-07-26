@@ -1,4 +1,5 @@
 using McpGateway.Core.Domain;
+using McpGateway.Core.Domain.Enums;
 using McpGateway.TestUtils.Persistence;
 
 using Microsoft.EntityFrameworkCore;
@@ -16,7 +17,7 @@ public class AuditEntryPersistenceTests : PersistenceTestBase
             UpstreamName = "upstream",
             ToolName = "search",
             ClientName = "claude-code",
-            Status = AuditStatus.Success,
+            Status = ToolUseStatus.Success,
             LatencyMs = 42,
         };
 
@@ -28,7 +29,7 @@ public class AuditEntryPersistenceTests : PersistenceTestBase
         await using var freshContext = CreateContext();
         var loaded = await freshContext.AuditEntries.SingleAsync(a => a.Id == entry.Id);
 
-        await Assert.That(loaded.Status).IsEqualTo(AuditStatus.Success);
+        await Assert.That(loaded.Status).IsEqualTo(ToolUseStatus.Success);
         await Assert.That(loaded.LatencyMs).IsEqualTo(42L);
         await Assert.That(loaded.Input).IsNull();
         await Assert.That(loaded.Output).IsNull();
@@ -41,7 +42,7 @@ public class AuditEntryPersistenceTests : PersistenceTestBase
         {
             Timestamp = DateTimeOffset.UtcNow,
             ToolName = "search",
-            Status = AuditStatus.Error,
+            Status = ToolUseStatus.Error,
             LatencyMs = 7,
             Input = """{"query":"test"}""",
             Output = """{"error":"timeout"}""",
@@ -62,9 +63,21 @@ public class AuditEntryPersistenceTests : PersistenceTestBase
     {
         var now = DateTimeOffset.UtcNow;
         Context.AuditEntries.AddRange(
-            new AuditEntry { Timestamp = now, ToolName = "search", ClientName = "claude-code", Status = AuditStatus.Success, LatencyMs = 1 },
-            new AuditEntry { Timestamp = now, ToolName = "fetch", ClientName = "claude-code", Status = AuditStatus.Success, LatencyMs = 2 },
-            new AuditEntry { Timestamp = now, ToolName = "search", ClientName = "other-client", Status = AuditStatus.Success, LatencyMs = 3 });
+            new AuditEntry
+            {
+                Timestamp = now, ToolName = "search", ClientName = "claude-code", Status = ToolUseStatus.Success,
+                LatencyMs = 1
+            },
+            new AuditEntry
+            {
+                Timestamp = now, ToolName = "fetch", ClientName = "claude-code", Status = ToolUseStatus.Success,
+                LatencyMs = 2
+            },
+            new AuditEntry
+            {
+                Timestamp = now, ToolName = "search", ClientName = "other-client", Status = ToolUseStatus.Success,
+                LatencyMs = 3
+            });
         await Context.SaveChangesAsync();
 
         await using var freshContext = CreateContext();

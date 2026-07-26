@@ -1,4 +1,4 @@
-namespace McpGateway.Core.Domain;
+namespace McpGateway.Core.Domain.Enums;
 
 public enum AuthKind
 {

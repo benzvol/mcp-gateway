@@ -2,9 +2,9 @@ namespace McpGateway.Core.Domain;
 
 public class ToolOverride
 {
-    public Guid Id { get; set; }
+    public Guid Id { get; init; } = Guid.CreateVersion7();
 
-    public Guid UpstreamId { get; set; }
+    public Guid UpstreamId { get; init; }
 
     public required string ToolName { get; set; }
 

@@ -1,4 +1,5 @@
 using McpGateway.Core.Domain;
+using McpGateway.Core.Domain.Enums;
 using McpGateway.TestUtils.Persistence;
 
 using Microsoft.EntityFrameworkCore;
@@ -12,7 +13,6 @@ public class GatewayClientPersistenceTests : PersistenceTestBase
     {
         var client = new GatewayClient
         {
-            Id = Guid.NewGuid(),
             Name = "claude-code",
             AuthKind = AuthKind.ApiKey,
             Secret = "client-secret",
@@ -32,10 +32,10 @@ public class GatewayClientPersistenceTests : PersistenceTestBase
     [Test]
     public async Task DuplicateClientName_ViolatesUniqueIndex()
     {
-        Context.GatewayClients.Add(new GatewayClient { Id = Guid.NewGuid(), Name = "claude-code", AuthKind = AuthKind.None });
+        Context.GatewayClients.Add(new GatewayClient { Name = "claude-code", AuthKind = AuthKind.None });
         await Context.SaveChangesAsync();
 
-        Context.GatewayClients.Add(new GatewayClient { Id = Guid.NewGuid(), Name = "claude-code", AuthKind = AuthKind.None });
+        Context.GatewayClients.Add(new GatewayClient { Name = "claude-code", AuthKind = AuthKind.None });
 
         await Assert.That(async () => await Context.SaveChangesAsync()).Throws<DbUpdateException>();
     }

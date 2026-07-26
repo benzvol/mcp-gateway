@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Design;
 
 namespace McpGateway.Core.DependencyInjection;
 
-public class GatewayDbContextFactory : IDesignTimeDbContextFactory<GatewayDbContext>
+public class GatewayDesignTimeDbContextFactory : IDesignTimeDbContextFactory<GatewayDbContext>
 {
     public GatewayDbContext CreateDbContext(string[] args)
     {

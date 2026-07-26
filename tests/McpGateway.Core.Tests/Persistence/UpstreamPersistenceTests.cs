@@ -1,4 +1,5 @@
 using McpGateway.Core.Domain;
+using McpGateway.Core.Domain.Enums;
 using McpGateway.TestUtils.Persistence;
 
 using Microsoft.EntityFrameworkCore;
@@ -10,7 +11,7 @@ public class UpstreamPersistenceTests : PersistenceTestBase
     [Test]
     public async Task Upstream_DefaultsToEnabled()
     {
-        var upstream = new Upstream { Id = Guid.NewGuid(), Name = "default-upstream", Transport = TransportKind.Stdio };
+        var upstream = new Upstream { Name = "default-upstream", Transport = TransportKind.Stdio };
 
         Context.Upstreams.Add(upstream);
         await Context.SaveChangesAsync();
@@ -26,7 +27,6 @@ public class UpstreamPersistenceTests : PersistenceTestBase
     {
         var upstream = new Upstream
         {
-            Id = Guid.NewGuid(),
             Name = "stdio-upstream",
             Enabled = true,
             Transport = TransportKind.Stdio,
@@ -44,7 +44,8 @@ public class UpstreamPersistenceTests : PersistenceTestBase
 
         await Assert.That(loaded.Transport).IsEqualTo(TransportKind.Stdio);
         await Assert.That(loaded.Command).IsEqualTo("npx");
-        await Assert.That(loaded.Args).IsEquivalentTo(upstream.Args, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(loaded.Args)
+            .IsEquivalentTo(upstream.Args, TUnit.Assertions.Enums.CollectionOrdering.Matching);
         await Assert.That(loaded.Environment["API_KEY"]).IsEqualTo("secret-value");
     }
 
@@ -53,7 +54,6 @@ public class UpstreamPersistenceTests : PersistenceTestBase
     {
         var upstream = new Upstream
         {
-            Id = Guid.NewGuid(),
             Name = "http-upstream",
             Enabled = true,
             Transport = TransportKind.StreamableHttp,
@@ -82,7 +82,6 @@ public class UpstreamPersistenceTests : PersistenceTestBase
     {
         var upstream = new Upstream
         {
-            Id = Guid.NewGuid(),
             Name = $"upstream-{authKind}",
             Enabled = true,
             Transport = TransportKind.StreamableHttp,

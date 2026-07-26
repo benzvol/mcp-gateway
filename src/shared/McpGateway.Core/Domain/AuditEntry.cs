@@ -1,10 +1,12 @@
+using McpGateway.Core.Domain.Enums;
+
 namespace McpGateway.Core.Domain;
 
 public class AuditEntry
 {
-    public long Id { get; set; }
+    public long Id { get; init; }
 
-    public DateTimeOffset Timestamp { get; set; }
+    public DateTimeOffset Timestamp { get; init; }
 
     public string? UpstreamName { get; set; }
 
@@ -12,7 +14,7 @@ public class AuditEntry
 
     public string? ClientName { get; set; }
 
-    public AuditStatus Status { get; set; }
+    public ToolUseStatus Status { get; set; }
 
     public long LatencyMs { get; set; }
 

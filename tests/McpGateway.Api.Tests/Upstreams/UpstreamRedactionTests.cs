@@ -13,14 +13,14 @@ public class UpstreamRedactionTests : UpstreamApiTestBase
     public async Task GetById_ResponseDoesNotContainSecret()
     {
         var created = await Client.PostAsJsonAsync("/api/upstreams", RequestWithSecret());
-        var upstream = await created.Content.ReadFromJsonAsync<UpstreamResponse>();
+        var upstream = await created.Content.ReadFromJsonAsync<UpstreamResponse>(JsonOptions);
 
         var response = await Client.GetAsync($"/api/upstreams/{upstream!.Id}");
         var raw = await response.Content.ReadAsStringAsync();
 
         await Assert.That(raw.Contains(Secret)).IsFalse();
 
-        var body = await response.Content.ReadFromJsonAsync<UpstreamResponse>();
+        var body = await response.Content.ReadFromJsonAsync<UpstreamResponse>(JsonOptions);
         await Assert.That(body!.HasSecret).IsTrue();
     }
 

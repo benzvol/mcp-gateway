@@ -71,7 +71,7 @@ public class TestConnectionApiTests : UpstreamApiTestBase
             "sk-live-test",
             null);
         var created = await Client.PostAsJsonAsync("/api/upstreams", createRequest);
-        var upstream = await created.Content.ReadFromJsonAsync<UpstreamResponse>();
+        var upstream = await created.Content.ReadFromJsonAsync<UpstreamResponse>(JsonOptions);
 
         var response = await Client.PostAsync($"/api/upstreams/{upstream!.Id}/test", null);
 

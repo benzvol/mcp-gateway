@@ -1,3 +1,6 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
+
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 
@@ -5,6 +8,11 @@ namespace McpGateway.Api.Tests.Upstreams;
 
 public abstract class UpstreamApiTestBase : WebApplicationFactory<Program>
 {
+    protected static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web)
+    {
+        Converters = { new JsonStringEnumConverter() },
+    };
+
     private string _databasePath = null!;
 
     protected HttpClient Client { get; private set; } = null!;

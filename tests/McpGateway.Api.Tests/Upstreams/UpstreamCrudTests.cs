@@ -18,7 +18,7 @@ public class UpstreamCrudTests : UpstreamApiTestBase
         await Assert.That(response.StatusCode).IsEqualTo(HttpStatusCode.Created);
         await Assert.That(response.Headers.Location).IsNotNull();
 
-        var body = await response.Content.ReadFromJsonAsync<UpstreamResponse>();
+        var body = await response.Content.ReadFromJsonAsync<UpstreamResponse>(JsonOptions);
         await Assert.That(body!.Name).IsEqualTo("filesystem");
         await Assert.That(body.Enabled).IsTrue();
     }
@@ -81,7 +81,7 @@ public class UpstreamCrudTests : UpstreamApiTestBase
         await Client.PostAsJsonAsync("/api/upstreams", StdioRequest("filesystem"));
         await Client.PostAsJsonAsync("/api/upstreams", HttpRequest("octopus-deploy"));
 
-        var upstreams = await Client.GetFromJsonAsync<UpstreamResponse[]>("/api/upstreams");
+        var upstreams = await Client.GetFromJsonAsync<UpstreamResponse[]>("/api/upstreams", JsonOptions);
 
         await Assert.That(upstreams!.Length).IsEqualTo(2);
     }
@@ -98,7 +98,7 @@ public class UpstreamCrudTests : UpstreamApiTestBase
     public async Task Put_UpdatesFields()
     {
         var created = await Client.PostAsJsonAsync("/api/upstreams", StdioRequest("filesystem"));
-        var upstream = await created.Content.ReadFromJsonAsync<UpstreamResponse>();
+        var upstream = await created.Content.ReadFromJsonAsync<UpstreamResponse>(JsonOptions);
 
         var update = new UpdateUpstreamRequest(
             "filesystem-renamed",
@@ -116,7 +116,7 @@ public class UpstreamCrudTests : UpstreamApiTestBase
         var response = await Client.PutAsJsonAsync($"/api/upstreams/{upstream!.Id}", update);
 
         await Assert.That(response.StatusCode).IsEqualTo(HttpStatusCode.OK);
-        var body = await response.Content.ReadFromJsonAsync<UpstreamResponse>();
+        var body = await response.Content.ReadFromJsonAsync<UpstreamResponse>(JsonOptions);
         await Assert.That(body!.Name).IsEqualTo("filesystem-renamed");
         await Assert.That(body.Enabled).IsFalse();
     }
@@ -125,7 +125,7 @@ public class UpstreamCrudTests : UpstreamApiTestBase
     public async Task Delete_RemovesRow_Returns204()
     {
         var created = await Client.PostAsJsonAsync("/api/upstreams", StdioRequest("filesystem"));
-        var upstream = await created.Content.ReadFromJsonAsync<UpstreamResponse>();
+        var upstream = await created.Content.ReadFromJsonAsync<UpstreamResponse>(JsonOptions);
 
         var response = await Client.DeleteAsync($"/api/upstreams/{upstream!.Id}");
 
@@ -138,14 +138,14 @@ public class UpstreamCrudTests : UpstreamApiTestBase
     public async Task Post_Enabled_TogglesEnabled()
     {
         var created = await Client.PostAsJsonAsync("/api/upstreams", StdioRequest("filesystem"));
-        var upstream = await created.Content.ReadFromJsonAsync<UpstreamResponse>();
+        var upstream = await created.Content.ReadFromJsonAsync<UpstreamResponse>(JsonOptions);
 
         var response = await Client.PostAsJsonAsync(
             $"/api/upstreams/{upstream!.Id}/enabled",
             new SetEnabledRequest(false));
 
         await Assert.That(response.StatusCode).IsEqualTo(HttpStatusCode.NoContent);
-        var reloaded = await Client.GetFromJsonAsync<UpstreamResponse>($"/api/upstreams/{upstream.Id}");
+        var reloaded = await Client.GetFromJsonAsync<UpstreamResponse>($"/api/upstreams/{upstream.Id}", JsonOptions);
         await Assert.That(reloaded!.Enabled).IsFalse();
     }
 

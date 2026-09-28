@@ -14,5 +14,13 @@ export default defineConfigWithVueTs(
   },
   pluginVue.configs['flat/recommended'],
   vueTsConfigs.recommended,
+  {
+    name: 'app/shadcn-vue-ui-overrides',
+    files: ['src/components/ui/**/*.vue'],
+    rules: {
+      'vue/multi-word-component-names': 'off',
+      'vue/require-default-prop': 'off',
+    },
+  },
   skipFormatting,
 )
